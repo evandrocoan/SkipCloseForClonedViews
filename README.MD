@@ -11,8 +11,14 @@ Sublime Text keeps asking whether I would like to save my changes.
 
 (You can clone a view by going on the menu `File -> New view into file`)
 
-There there is a setting called `skip_close_for_cloned_views` where you can set in any settings hierarchy:
-Settings files are consulted in this order:
+There there is a setting called `skip_close_for_cloned_views`:
+```js
+    // Enable or disable the save question for views from cloned files (default true)
+    "skip_close_for_cloned_views": true,
+```
+
+You can set the setting `skip_close_for_cloned_views` in any settings hierarchy.
+The settings files are consulted in this order:
 1. Packages/Default/Preferences.sublime-settings
 2. Packages/Default/Preferences (`<platform>`).sublime-settings
 3. Packages/User/Preferences.sublime-settings **<--we are around here, the 3º less priority level**

@@ -38,7 +38,7 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
             self.cloned_buffers_ids[buffer_id] -= 1
 
         # print('cloned_buffers_ids   ', self.cloned_buffers_ids)
-        if self.cloned_buffers_ids[buffer_id] < 1:
+        if buffer_id in self.cloned_buffers_ids and self.cloned_buffers_ids[buffer_id] < 1:
             del self.cloned_buffers_ids[buffer_id]
 
     @classmethod

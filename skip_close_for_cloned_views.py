@@ -64,6 +64,7 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
 
     @classmethod
     def is_cloned(cls, view):
+        if view.settings().get('is_widget'): return
         buffer_id = view.buffer_id()
         if buffer_id not in cls.cloned_buffers_ids: cls.create_cloned_buffers()
 

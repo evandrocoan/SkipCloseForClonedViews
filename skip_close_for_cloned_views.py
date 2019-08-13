@@ -20,7 +20,7 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
         buffer_id = view.buffer_id()
 
         if buffer_id not in self.cloned_buffers_ids:
-            self.create_cloned_buffers()
+            self.create_cloned_buffers( 'on_close' )
 
         else:
             self.cloned_buffers_ids[buffer_id] += 1
@@ -32,7 +32,7 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
         buffer_id = view.buffer_id()
 
         if buffer_id not in self.cloned_buffers_ids:
-            self.create_cloned_buffers()
+            self.create_cloned_buffers( 'on_close' )
 
         else:
             self.cloned_buffers_ids[buffer_id] -= 1
@@ -42,11 +42,12 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
             del self.cloned_buffers_ids[buffer_id]
 
     @classmethod
-    def create_cloned_buffers(cls):
+    def create_cloned_buffers(cls, source_event):
         """ Fix our internal buffers when Sublime Text is started with several views
         https://github.com/SublimeTextIssues/Core/issues/5
         """
         windows = sublime.windows()
+        print( "Recreating all cloned views buffers as requested by '%s'..." % source_event )
 
         for window in windows:
             views = window.views()
@@ -66,9 +67,9 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
     def is_cloned(cls, view):
         if view.settings().get('is_widget'): return
         buffer_id = view.buffer_id()
-        if buffer_id not in cls.cloned_buffers_ids: cls.create_cloned_buffers()
+        if buffer_id not in cls.cloned_buffers_ids: cls.create_cloned_buffers( 'is_cloned' )
 
-        return cls.cloned_buffers_ids[buffer_id] > 1
+        return buffer_id in cls.cloned_buffers_ids and cls.cloned_buffers_ids[buffer_id] > 1
 
     def on_window_command(self, window, command_name, args):
         # print('window', window, command_name, args)

@@ -32,7 +32,8 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
         buffer_id = view.buffer_id()
 
         if buffer_id not in self.cloned_buffers_ids:
-            self.create_cloned_buffers( 'on_close' )
+            # self.create_cloned_buffers( 'on_close' )
+            return
 
         else:
             self.cloned_buffers_ids[buffer_id] -= 1
@@ -47,7 +48,7 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
         https://github.com/SublimeTextIssues/Core/issues/5
         """
         windows = sublime.windows()
-        print( "Recreating all cloned views buffers as requested by '%s'..." % source_event )
+        print( "SkipCloseForClonedViews: Recreating all cloned views buffers as requested by '%s'..." % source_event )
 
         for window in windows:
             views = window.views()

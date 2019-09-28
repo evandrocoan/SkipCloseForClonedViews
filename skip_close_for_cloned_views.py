@@ -6,71 +6,16 @@ class SkipCloseForClonedViewsEventListener(sublime_plugin.EventListener):
     closed_view = None
     cloned_buffers_ids = {}
 
-    def on_load(self, view):
-        # print('on_load', view.buffer_id())
-        self.on_new( view )
-
-    def on_new(self, view):
-        # print('on_new', view.buffer_id())
-        buffer_id = view.buffer_id()
-        self.cloned_buffers_ids[buffer_id] = 1
-
-    def on_clone(self, view):
-        # print('on_clone', view.buffer_id())
-        buffer_id = view.buffer_id()
-
-        if buffer_id not in self.cloned_buffers_ids:
-            self.create_cloned_buffers( 'on_close' )
-
-        else:
-            self.cloned_buffers_ids[buffer_id] += 1
-
-        # print('cloned_buffers_ids   ', self.cloned_buffers_ids)
-
-    def on_close(self, view):
-        # print('on_close', view.buffer_id())
-        buffer_id = view.buffer_id()
-
-        if buffer_id not in self.cloned_buffers_ids:
-            # self.create_cloned_buffers( 'on_close' )
-            return
-
-        else:
-            self.cloned_buffers_ids[buffer_id] -= 1
-
-        # print('cloned_buffers_ids   ', self.cloned_buffers_ids)
-        if buffer_id in self.cloned_buffers_ids and self.cloned_buffers_ids[buffer_id] < 1:
-            del self.cloned_buffers_ids[buffer_id]
-
     @classmethod
-    def create_cloned_buffers(cls, source_event):
-        """ Fix our internal buffers when Sublime Text is started with several views
-        https://github.com/SublimeTextIssues/Core/issues/5
-        """
-        windows = sublime.windows()
-        print( "SkipCloseForClonedViews: Recreating all cloned views buffers as requested by '%s'..." % source_event )
-
-        for window in windows:
-            views = window.views()
-
-            for view in views:
-                buffer_id = view.buffer_id()
-
-                if buffer_id in cls.cloned_buffers_ids:
-                    cls.cloned_buffers_ids[buffer_id] += 1
-
-                else:
-                    cls.cloned_buffers_ids[buffer_id] = 1
-
-        # print('create_cloned_buffers', cls.cloned_buffers_ids)
-
-    @classmethod
-    def is_cloned(cls, view):
-        if view.settings().get('is_widget'): return
-        buffer_id = view.buffer_id()
-        if buffer_id not in cls.cloned_buffers_ids: cls.create_cloned_buffers( 'is_cloned' )
-
-        return buffer_id in cls.cloned_buffers_ids and cls.cloned_buffers_ids[buffer_id] > 1
+    def is_cloned(cls, input_view):
+        buffer_id = input_view.buffer_id()
+        return \
+            len( [
+                    view
+                        for window in sublime.windows()
+                            for view in window.views()
+                                if view.buffer_id() == buffer_id
+                ] ) > 1
 
     def on_window_command(self, window, command_name, args):
         # print('window', window, command_name, args)
